@@ -2,14 +2,9 @@
 
 <br/>
 
-```
- ███████╗██████╗  ██████╗ ████████╗██╗███████╗██╗      █████╗  ██████╗
- ██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║██╔════╝██║     ██╔══██╗██╔════╝
- ███████╗██████╔╝██║   ██║   ██║   ██║█████╗  ██║     ███████║██║
- ╚════██║██╔═══╝ ██║   ██║   ██║   ██║██╔══╝  ██║     ██╔══██║██║
- ███████║██║     ╚██████╔╝   ██║   ██║██║     ███████╗██║  ██║╚██████╗
- ╚══════╝╚═╝      ╚═════╝    ╚═╝   ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝
-```
+<img src="docs/assets/logo.svg" width="160" alt="SpotiFLAC logo"/>
+
+<br/>
 
 **Download true lossless FLAC music from Apple Music, YouTube Music, and more.**  
 Organized by album, artist, or playlist. No browser prompts. No compression.
@@ -85,6 +80,24 @@ Downloads/
 
 ### 🧩 Extension System
 SpotiFLAC is built around pluggable source extensions. Each extension is a single `.js` file dropped into the `extensions/` folder. Enable, disable, or install new ones from inside the app — no restart needed.
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+| Home | Search Results |
+|------|----------------|
+| ![Home screen](docs/assets/screenshot-home.png) | ![Search results](docs/assets/screenshot-search.png) |
+
+<br/>
+
+**Album / Collection view — select tracks and download as FLAC**
+
+![Collection view](docs/assets/screenshot-collection.png)
+
+</div>
 
 ---
 
