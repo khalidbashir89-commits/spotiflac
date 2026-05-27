@@ -42,6 +42,9 @@ You search, browse an album or playlist, tick the tracks you want, and click dow
 |--------|--------|---------|
 | Apple Music | ALAC → FLAC | 16-bit/44.1kHz CD Lossless or 24-bit/192kHz Hi-Res |
 | YouTube Music | AAC → FLAC | Best available quality via yt-dlp |
+| Deezer | FLAC | CD Lossless — requires HiFi subscription + ARL token |
+| Spotify | YouTube → FLAC | Via spotDL — not lossless, YouTube-sourced |
+| SoundCloud | AAC → FLAC | Via yt-dlp |
 | JioSaavn | MP4 → FLAC | 320kbps |
 
 ### 📁 Organized Downloads
@@ -125,13 +128,23 @@ npm start          # opens at http://localhost:3000
 
 ## ⚙️ Prerequisites
 
-SpotiFLAC handles the UI and orchestration. The actual audio downloading and conversion relies on three external tools:
+SpotiFLAC handles the UI and orchestration. The actual audio downloading and conversion relies on external CLI tools — install only the ones for the sources you use:
+
+**Always required**
 
 | Tool | Purpose | Install |
 |------|---------|---------|
-| **Python 3.9+** | Runs gamdl for Apple Music | [python.org](https://python.org/downloads) |
-| **gamdl** | Decrypts Apple Music ALAC streams | `pip install gamdl` |
-| **ffmpeg** | Converts ALAC/AAC → FLAC | [ffmpeg.org](https://ffmpeg.org/download.html) |
+| **Python 3.9+** | Required by gamdl, deemix, spotDL | [python.org](https://python.org/downloads) |
+| **ffmpeg** | Audio conversion (all sources) | [ffmpeg.org](https://ffmpeg.org/download.html) |
+| **yt-dlp** | YouTube Music + SoundCloud | `pip install yt-dlp` |
+
+**Per source (install what you need)**
+
+| Tool | Source | Install |
+|------|--------|---------|
+| **gamdl** | Apple Music (lossless ALAC) | `pip install gamdl` |
+| **deemix** | Deezer (FLAC, HiFi sub required) | `pip install deemix` |
+| **spotDL** | Spotify (YouTube-sourced FLAC) | `pip install spotdl` |
 
 > **ffmpeg tip:** Place `ffmpeg.exe` in `C:\Users\<you>\.spotiflac\` and SpotiFLAC will find it automatically — no PATH changes needed.
 

@@ -1,6 +1,9 @@
 'use strict';
 
 const { app, BrowserWindow, shell } = require('electron');
+const path = require('path');
+
+const ICON = path.join(__dirname, 'public', 'icon.png');
 
 let mainWindow = null;
 let serverPort = 3000;
@@ -20,6 +23,7 @@ app.whenReady().then(async () => {
     width: 1280,
     height: 860,
     title: 'SpotiFLAC',
+    icon: ICON,
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,

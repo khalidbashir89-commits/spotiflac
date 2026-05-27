@@ -234,6 +234,18 @@ app.get('/api/download-flac', async (req, res) => {
       // YouTube Music via yt-dlp
       const videoId = url.replace('ytm://', '');
       await downloadYtFlac(videoId, res, resolved);
+    } else if (url.startsWith('sc://')) {
+      // SoundCloud via yt-dlp
+      const scUrl = decodeURIComponent(url.replace('sc://', ''));
+      await ytdlpFlac(scUrl, res);
+    } else if (url.startsWith('deemix://')) {
+      // Deezer via deemix
+      const deezerId = url.replace('deemix://', '');
+      await downloadDeemixFlac(deezerId, res, title, artist);
+    } else if (url.startsWith('spotdl://')) {
+      // Spotify via spotDL
+      const spotifyId = url.replace('spotdl://', '');
+      await downloadSpotdlFlac(spotifyId, res, title, artist);
     } else {
       // Direct URL (JioSaavn CDN, etc.) → pipe through ffmpeg
       await downloadUrlFlac(url, res, resolved);
@@ -554,8 +566,15 @@ app.post('/api/download-zip', async (req, res) => {
         let flacBuffer;
 
         if (url.startsWith('apm://')) {
-          const songId = url.replace('apm://', '');
-          flacBuffer = await appleToFlacBuffer(songId, resolved);
+          flacBuffer = await appleToFlacBuffer(url.replace('apm://', ''), resolved);
+        } else if (url.startsWith('ytm://')) {
+          flacBuffer = await ytdlpToFlacBuffer(url.replace('ytm://', ''));
+        } else if (url.startsWith('sc://')) {
+          flacBuffer = await ytdlpUrlToFlacBuffer(decodeURIComponent(url.replace('sc://', '')));
+        } else if (url.startsWith('deemix://')) {
+          flacBuffer = await deemixToFlacBuffer(url.replace('deemix://', ''), t.title, t.artist);
+        } else if (url.startsWith('spotdl://')) {
+          flacBuffer = await spotdlToFlacBuffer(url.replace('spotdl://', ''), t.title, t.artist);
         } else {
           flacBuffer = await urlToFlacBuffer(url, resolved);
         }
@@ -697,6 +716,12 @@ app.post('/api/save-flac', async (req, res) => {
       buf = await appleToFlacBuffer(url.replace('apm://', ''), resolved);
     } else if (url.startsWith('ytm://')) {
       buf = await ytdlpToFlacBuffer(url.replace('ytm://', ''));
+    } else if (url.startsWith('sc://')) {
+      buf = await ytdlpUrlToFlacBuffer(decodeURIComponent(url.replace('sc://', '')));
+    } else if (url.startsWith('deemix://')) {
+      buf = await deemixToFlacBuffer(url.replace('deemix://', ''), title, artist);
+    } else if (url.startsWith('spotdl://')) {
+      buf = await spotdlToFlacBuffer(url.replace('spotdl://', ''), title, artist);
     } else {
       buf = await urlToFlacBuffer(url, resolved);
     }
@@ -745,6 +770,150 @@ function ytdlpToFlacBuffer(videoId) {
         resolve(buf);
       });
     });
+  });
+}
+
+// SoundCloud / any URL → FLAC Buffer via yt-dlp (used for sc:// and arbitrary URLs)
+function ytdlpUrlToFlacBuffer(fullUrl) {
+  return new Promise((resolve, reject) => {
+    const tmpBase = path.join(os.tmpdir(), `spf_sc_${Date.now()}`);
+    const tmpOut = tmpBase + '.flac';
+
+    const ytdlp = spawn(YTDLP, [
+      '--format', 'bestaudio', '--no-playlist',
+      '-o', tmpBase + '.%(ext)s',
+      fullUrl,
+    ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+    let ytErr = '';
+    ytdlp.stderr.on('data', d => { ytErr += d; });
+    ytdlp.on('error', reject);
+    ytdlp.on('close', code => {
+      if (code !== 0) return reject(new Error('yt-dlp exit ' + code + ': ' + ytErr.slice(-200)));
+      const dir = path.dirname(tmpBase);
+      const base = path.basename(tmpBase);
+      const actualIn = fs.readdirSync(dir).map(f => path.join(dir, f)).find(f => path.basename(f).startsWith(base) && !f.endsWith('.flac'));
+      if (!actualIn) return reject(new Error('yt-dlp output not found'));
+      const ff = spawn(FFMPEG, ['-y', '-i', actualIn, '-c:a', 'flac', '-compression_level', '5', tmpOut],
+        { stdio: ['ignore', 'ignore', 'pipe'] });
+      ff.on('error', e => { try { fs.unlinkSync(actualIn); } catch {} reject(e); });
+      ff.on('close', ffCode => {
+        try { fs.unlinkSync(actualIn); } catch {}
+        if (ffCode !== 0) { try { fs.unlinkSync(tmpOut); } catch {} return reject(new Error('ffmpeg exit ' + ffCode)); }
+        const buf = fs.readFileSync(tmpOut);
+        try { fs.unlinkSync(tmpOut); } catch {}
+        resolve(buf);
+      });
+    });
+  });
+}
+
+// Deezer → FLAC Buffer via deemix
+const DEEZER_ARL_PATH = path.join(os.homedir(), '.spotiflac', 'deezer-arl.txt');
+function getDeezerArl() {
+  if (!fs.existsSync(DEEZER_ARL_PATH)) return null;
+  const arl = fs.readFileSync(DEEZER_ARL_PATH, 'utf8').trim();
+  return arl.length > 100 ? arl : null;
+}
+
+function deemixToFlacBuffer(deezerId, title, artist) {
+  return new Promise((resolve, reject) => {
+    const arl = getDeezerArl();
+    if (!arl) return reject(new Error('Deezer ARL not configured. Add your ARL token to ~/.spotiflac/deezer-arl.txt'));
+
+    const tmpDir = path.join(os.tmpdir(), `spf_dzr_${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+    const deezerUrl = `https://www.deezer.com/track/${deezerId}`;
+    console.log('[deemix] Downloading track', deezerId);
+
+    const dm = spawn('deemix', [
+      '--arl', arl,
+      '--bitrate', 'FLAC',
+      '--path', tmpDir,
+      deezerUrl,
+    ], { stdio: ['ignore', 'pipe', 'pipe'] });
+
+    let dmOut = '', dmErr = '';
+    dm.stdout.on('data', d => { dmOut += d; });
+    dm.stderr.on('data', d => { dmErr += d; });
+    dm.on('error', e => { fs.rmSync(tmpDir, { recursive: true, force: true }); reject(new Error('deemix not found. Install with: pip install deemix')); });
+    dm.on('close', code => {
+      function findFlac(dir) {
+        for (const f of fs.readdirSync(dir)) {
+          const full = path.join(dir, f);
+          if (fs.statSync(full).isDirectory()) { const r = findFlac(full); if (r) return r; }
+          else if (f.endsWith('.flac')) return full;
+        }
+        return null;
+      }
+      const flacPath = findFlac(tmpDir);
+      if (!flacPath) {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+        const msg = (dmErr + dmOut).slice(-400);
+        if (code !== 0) return reject(new Error(`deemix exit ${code}: ${msg}`));
+        return reject(new Error('deemix succeeded but no FLAC found. Ensure you have a Deezer HiFi subscription.'));
+      }
+      const buf = fs.readFileSync(flacPath);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+      resolve(buf);
+    });
+  });
+}
+
+// Streaming helpers for the /api/download-flac endpoint (pipes to response)
+function downloadDeemixFlac(deezerId, res, title, artist) {
+  return deemixToFlacBuffer(deezerId, title, artist).then(buf => {
+    res.write(buf);
+    res.end();
+  });
+}
+
+// Spotify → FLAC via spotDL
+const SPOTDL_DIR = path.join(os.homedir(), '.spotiflac', 'spotdl');
+
+function spotdlToFlacBuffer(spotifyId, title, artist) {
+  return new Promise((resolve, reject) => {
+    const tmpDir = path.join(os.tmpdir(), `spf_spf_${Date.now()}`);
+    fs.mkdirSync(tmpDir, { recursive: true });
+    const spotifyUrl = `https://open.spotify.com/track/${spotifyId}`;
+    console.log('[spotdl] Downloading track', spotifyId);
+
+    const sd = spawn('spotdl', [
+      'download', spotifyUrl,
+      '--format', 'flac',
+      '--output', tmpDir,
+    ], { stdio: ['ignore', 'pipe', 'pipe'] });
+
+    let sdOut = '', sdErr = '';
+    sd.stdout.on('data', d => { sdOut += d; });
+    sd.stderr.on('data', d => { sdErr += d; });
+    sd.on('error', e => { fs.rmSync(tmpDir, { recursive: true, force: true }); reject(new Error('spotdl not found. Install with: pip install spotdl')); });
+    sd.on('close', code => {
+      function findFlac(dir) {
+        for (const f of fs.readdirSync(dir)) {
+          const full = path.join(dir, f);
+          if (fs.statSync(full).isDirectory()) { const r = findFlac(full); if (r) return r; }
+          else if (f.endsWith('.flac')) return full;
+        }
+        return null;
+      }
+      const flacPath = findFlac(tmpDir);
+      if (!flacPath) {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+        const msg = (sdErr + sdOut).slice(-400);
+        return reject(new Error(code !== 0 ? `spotdl exit ${code}: ${msg}` : 'spotdl succeeded but no FLAC found'));
+      }
+      const buf = fs.readFileSync(flacPath);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+      resolve(buf);
+    });
+  });
+}
+
+function downloadSpotdlFlac(spotifyId, res, title, artist) {
+  return spotdlToFlacBuffer(spotifyId, title, artist).then(buf => {
+    res.write(buf);
+    res.end();
   });
 }
 
@@ -977,6 +1146,149 @@ dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.
 </script>
 </body>
 </html>`);
+});
+
+// ── Deezer ARL Setup ───────────────────────────────────────────
+
+app.get('/deezer-setup', (req, res) => {
+  const configured = getDeezerArl() !== null;
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><title>Deezer Setup — SpotiFLAC</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;max-width:600px;margin:60px auto;padding:0 24px}
+  h1{font-size:24px;font-weight:700;margin-bottom:4px}
+  p{color:#a7a7a7;line-height:1.5}
+  .status{display:inline-block;padding:4px 12px;border-radius:100px;font-size:13px;font-weight:600;background:${configured?'#1fdf6422':'#ff000022'};color:${configured?'#1fdf64':'#ff6b6b'};border:1px solid ${configured?'#1fdf6455':'#ff000055'};margin-bottom:24px}
+  code{background:#1a1a1a;padding:2px 8px;border-radius:4px;font-size:13px}
+  input[type=text]{width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;margin:8px 0 16px;outline:none}
+  input[type=text]:focus{border-color:#1fdf64}
+  button{background:#1fdf64;color:#000;font-weight:700;border:none;border-radius:24px;padding:12px 28px;cursor:pointer;font-size:15px}
+  button:hover{background:#17b554}
+  .msg{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:14px;display:none}
+  .msg.ok{background:#1fdf6422;color:#1fdf64;border:1px solid #1fdf6444}
+  .msg.err{background:#ff000022;color:#ff6b6b;border:1px solid #ff000044}
+  ol li{margin-bottom:8px;color:#a7a7a7}
+  ol li b{color:#fff}
+  a{color:#1fdf64}
+</style></head>
+<body>
+<h1>🎵 Deezer Setup</h1>
+<p>Paste your Deezer ARL token below to enable FLAC downloads.</p>
+<span class="status">${configured ? '✓ ARL configured' : '✗ Not configured'}</span>
+
+<ol>
+  <li>Open <a href="https://www.deezer.com" target="_blank">deezer.com</a> in your browser and log in.</li>
+  <li>Open DevTools (F12) → <b>Application</b> → <b>Cookies</b> → <code>https://www.deezer.com</code></li>
+  <li>Find the cookie named <code>arl</code> and copy its value (a 192-character hex string).</li>
+  <li>Paste it below and click Save.</li>
+</ol>
+
+<label><b>ARL Token</b>
+<input type="text" id="arl-input" placeholder="Paste your 192-character ARL token here..." value=""/>
+</label>
+<button onclick="save()">Save ARL</button>
+<div id="msg" class="msg"></div>
+
+<script>
+async function save() {
+  const arl = document.getElementById('arl-input').value.trim();
+  if (arl.length < 100) { showMsg('ARL token looks too short. Make sure you copied the full value.', false); return; }
+  const r = await fetch('/api/deezer-arl', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ arl }) });
+  const d = await r.json();
+  if (r.ok) showMsg('✓ ARL saved! Deezer downloads are now enabled.', true);
+  else showMsg('Error: ' + (d.error || 'Unknown error'), false);
+}
+function showMsg(txt, ok) {
+  const el = document.getElementById('msg');
+  el.textContent = txt;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+  el.style.display = 'block';
+}
+</script>
+</body></html>`);
+});
+
+app.post('/api/deezer-arl', (req, res) => {
+  const { arl } = req.body;
+  if (!arl || arl.length < 100) return res.status(400).json({ error: 'ARL token too short' });
+  fs.mkdirSync(SPOTIFLAC_DIR, { recursive: true });
+  fs.writeFileSync(DEEZER_ARL_PATH, arl.trim());
+  res.json({ ok: true });
+});
+
+// ── Spotify Credentials Setup ───────────────────────────────────
+
+const SPOTIFY_CREDS_PATH = path.join(SPOTIFLAC_DIR, 'spotify-credentials.json');
+
+app.get('/spotify-setup', (req, res) => {
+  let configured = false;
+  try { const c = JSON.parse(fs.readFileSync(SPOTIFY_CREDS_PATH, 'utf8')); configured = !!(c.clientId && c.clientSecret); } catch {}
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"/><title>Spotify Setup — SpotiFLAC</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;max-width:600px;margin:60px auto;padding:0 24px}
+  h1{font-size:24px;font-weight:700;margin-bottom:4px}
+  p,li{color:#a7a7a7;line-height:1.5}
+  .status{display:inline-block;padding:4px 12px;border-radius:100px;font-size:13px;font-weight:600;background:${configured?'#1fdf6422':'#ff000022'};color:${configured?'#1fdf64':'#ff6b6b'};border:1px solid ${configured?'#1fdf6455':'#ff000055'};margin-bottom:24px}
+  code{background:#1a1a1a;padding:2px 8px;border-radius:4px;font-size:13px}
+  label b{color:#fff;font-size:14px}
+  input[type=text]{width:100%;box-sizing:border-box;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;padding:12px 14px;font-size:14px;margin:4px 0 16px;outline:none;display:block}
+  input[type=text]:focus{border-color:#1DB954}
+  button{background:#1DB954;color:#000;font-weight:700;border:none;border-radius:24px;padding:12px 28px;cursor:pointer;font-size:15px}
+  .msg{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:14px;display:none}
+  .msg.ok{background:#1DB95422;color:#1DB954;border:1px solid #1DB95444}
+  .msg.err{background:#ff000022;color:#ff6b6b;border:1px solid #ff000044}
+  a{color:#1DB954}
+  .note{font-size:13px;color:#666;margin-top:8px}
+</style></head>
+<body>
+<h1>🎵 Spotify Setup</h1>
+<p>Add Spotify API credentials to enable search. Downloads use <a href="https://github.com/spotDL/spotify-downloader" target="_blank">spotDL</a> — audio is sourced from YouTube (not lossless).</p>
+<span class="status">${configured ? '✓ Credentials configured' : '✗ Not configured'}</span>
+
+<ol>
+  <li>Go to <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a></li>
+  <li>Create a new app (any name/description), set Redirect URI to <code>http://localhost:8888</code></li>
+  <li>Open the app → <b>Settings</b> → copy Client ID and Client Secret</li>
+</ol>
+
+<label><b>Client ID</b>
+<input type="text" id="client-id" placeholder="32-character hex string"/>
+</label>
+<label><b>Client Secret</b>
+<input type="text" id="client-secret" placeholder="32-character hex string"/>
+</label>
+<button onclick="save()">Save Credentials</button>
+<div id="msg" class="msg"></div>
+<p class="note">Also install spotDL for downloads: <code>pip install spotdl</code></p>
+
+<script>
+async function save() {
+  const clientId = document.getElementById('client-id').value.trim();
+  const clientSecret = document.getElementById('client-secret').value.trim();
+  if (!clientId || !clientSecret) { showMsg('Both Client ID and Secret are required.', false); return; }
+  const r = await fetch('/api/spotify-credentials', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ clientId, clientSecret }) });
+  const d = await r.json();
+  if (r.ok) showMsg('✓ Credentials saved! Spotify search is now enabled.', true);
+  else showMsg('Error: ' + (d.error || 'Unknown error'), false);
+}
+function showMsg(txt, ok) {
+  const el = document.getElementById('msg'); el.textContent = txt; el.className = 'msg ' + (ok ? 'ok' : 'err'); el.style.display = 'block';
+}
+</script>
+</body></html>`);
+});
+
+app.post('/api/spotify-credentials', (req, res) => {
+  const { clientId, clientSecret } = req.body;
+  if (!clientId || !clientSecret) return res.status(400).json({ error: 'Missing clientId or clientSecret' });
+  fs.mkdirSync(SPOTIFLAC_DIR, { recursive: true });
+  fs.writeFileSync(SPOTIFY_CREDS_PATH, JSON.stringify({ clientId: clientId.trim(), clientSecret: clientSecret.trim() }, null, 2));
+  res.json({ ok: true });
 });
 
 // ── Static files ───────────────────────────────────────────────
