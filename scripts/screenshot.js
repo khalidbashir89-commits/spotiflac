@@ -1,6 +1,7 @@
 'use strict';
 
 const puppeteer = require('puppeteer');
+const fetch = require('node-fetch');
 const path = require('path');
 const fs   = require('fs');
 
@@ -15,33 +16,62 @@ async function shot(page, name) {
   console.log(`  ✓ ${name}`);
 }
 
-const MOCK_TRACKS = [
-  { id:'apm:1601234001', title:'Kesariya',              artist:'Arijit Singh', album:'Brahmastra', duration:290, trackNumber:1, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234002', title:'Dance Ka Bhoot',        artist:'Arijit Singh', album:'Brahmastra', duration:178, trackNumber:2, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234003', title:'Deva Deva',             artist:'Arijit Singh', album:'Brahmastra', duration:267, trackNumber:3, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234004', title:'Rasiya',                artist:'Arijit Singh', album:'Brahmastra', duration:241, trackNumber:4, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234005', title:'Brahmāstra Title Track',artist:'Pritam',       album:'Brahmastra', duration:189, trackNumber:5, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234006', title:'Shiva Theme',           artist:'Pritam',       album:'Brahmastra', duration:203, trackNumber:6, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234007', title:'Jhoome Jo Pathaan — Remix', artist:'Arijit Singh', album:'Brahmastra', duration:218, trackNumber:7, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234008', title:'Ve Haanja',             artist:'Arijit Singh', album:'Brahmastra', duration:255, trackNumber:8, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754',  albumId:'apm-album-in:1601234000' },
-  { id:'apm:1601234009', title:'Brahmāstra End Credits', artist:'Pritam',      album:'Brahmastra', duration:312, trackNumber:9, thumbnail:'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg', format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432',  albumId:'apm-album-in:1601234000' },
-];
+// Fetch image bytes and return as base64 data URL
+async function toDataUrl(url) {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buf = await res.buffer();
+  const mime = res.headers.get('content-type') || 'image/jpeg';
+  return `data:${mime};base64,${buf.toString('base64')}`;
+}
 
-const MOCK_ALBUM = {
-  type: 'album',
-  id: 'apm-album-in:1601234000',
-  title: 'Brahmastra (Original Motion Picture Soundtrack)',
-  artist: 'Pritam',
-  artistId: 'apm-artist-in:555432',
-  artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/500x500bb.jpg',
-  artworkHero: 'https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/3a/b9/38/3ab93863-68ce-2b55-4dd7-77fb28c97c7c/cover.jpg/800x800bb.jpg',
-  releaseDate: '2022',
-  trackCount: 9,
-  source: 'Apple Music',
-  tracks: MOCK_TRACKS,
-};
+// Find a publicly accessible album artwork URL via Deezer public API, then embed it
+async function fetchAlbumArtDataUrl(query) {
+  const apiUrl = `https://api.deezer.com/search/track?q=${encodeURIComponent(query)}&limit=1`;
+  const res = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+  if (!res.ok) throw new Error(`Deezer API ${res.status}`);
+  const data = await res.json();
+  const track = data.data && data.data[0];
+  if (!track) throw new Error('No results from Deezer');
+  const imgUrl = track.album.cover_xl || track.album.cover_big || track.album.cover_medium;
+  console.log(`  → artwork from Deezer: ${imgUrl}`);
+  return toDataUrl(imgUrl);
+}
 
 (async () => {
+  // Pre-fetch Brahmastra album artwork via Deezer public API, embed as data URL
+  console.log('Pre-fetching album artwork...');
+  const artData = await fetchAlbumArtDataUrl('Kesariya Brahmastra Arijit Singh');
+  console.log(`  ✓ artwork embedded (${Math.round(artData.length / 1024)}KB)`);
+
+  const MOCK_TRACKS = [
+    { id:'apm:1601234001', title:'Kesariya',               artist:'Arijit Singh', album:'Brahmastra', duration:290, trackNumber:1, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234002', title:'Dance Ka Bhoot',         artist:'Arijit Singh', album:'Brahmastra', duration:178, trackNumber:2, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234003', title:'Deva Deva',              artist:'Arijit Singh', album:'Brahmastra', duration:267, trackNumber:3, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234004', title:'Rasiya',                 artist:'Arijit Singh', album:'Brahmastra', duration:241, trackNumber:4, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234005', title:'Brahmāstra Title Track', artist:'Pritam',       album:'Brahmastra', duration:189, trackNumber:5, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234006', title:'Shiva Theme',            artist:'Pritam',       album:'Brahmastra', duration:203, trackNumber:6, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234007', title:'Jhoome Jo Pathaan — Remix', artist:'Arijit Singh', album:'Brahmastra', duration:218, trackNumber:7, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234008', title:'Ve Haanja',              artist:'Arijit Singh', album:'Brahmastra', duration:255, trackNumber:8, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:395754', albumId:'apm-album-in:1601234000' },
+    { id:'apm:1601234009', title:'Brahmāstra End Credits', artist:'Pritam',       album:'Brahmastra', duration:312, trackNumber:9, thumbnail:artData, format:'flac', quality:'Lossless ALAC', source:'Apple Music', artistId:'apm-artist-in:555432', albumId:'apm-album-in:1601234000' },
+  ];
+
+  const MOCK_ALBUM = {
+    type: 'album',
+    id: 'apm-album-in:1601234000',
+    title: 'Brahmastra (Original Motion Picture Soundtrack)',
+    artist: 'Pritam',
+    artistId: 'apm-artist-in:555432',
+    artwork: artData,
+    artworkHero: artData,
+    releaseDate: '2022',
+    trackCount: 9,
+    source: 'Apple Music',
+    tracks: MOCK_TRACKS,
+  };
+
   const browser = await puppeteer.launch({
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -59,7 +89,6 @@ const MOCK_ALBUM = {
   console.log('Taking search screenshot...');
   await page.goto(BASE, { waitUntil: 'networkidle2' });
 
-  // Enable interception before triggering search
   await page.setRequestInterception(true);
   page.on('request', req => {
     if (req.url().includes('/api/search')) {
@@ -87,10 +116,9 @@ const MOCK_ALBUM = {
   }
   await shot(page, 'screenshot-search.png');
 
-  // ── 3. Collection view with injected mock album data ────────
+  // ── 3. Collection view with embedded artwork ────────────────
   console.log('Taking collection screenshot...');
 
-  // Use a fresh page to avoid interception state issues
   const page3 = await browser.newPage();
   await page3.goto(BASE, { waitUntil: 'networkidle2' });
 
@@ -113,12 +141,20 @@ const MOCK_ALBUM = {
     }
   });
 
+  // Wait for tracks to render, then wait for hero image to finish loading
   try {
     await page3.waitForSelector('.collection-track-row, .ctrack-row, #collection-track-list .track-row', { timeout: 6000 });
-    await wait(600);
   } catch {
     await wait(3000);
   }
+
+  // Wait for the hero artwork image to be fully decoded
+  await page3.waitForFunction(() => {
+    const imgs = document.querySelectorAll('img');
+    return [...imgs].every(img => img.complete);
+  }, { timeout: 5000 }).catch(() => {});
+
+  await wait(400);
   await page3.screenshot({ path: path.join(OUT, 'screenshot-collection.png'), type: 'png' });
   console.log('  ✓ screenshot-collection.png');
 
