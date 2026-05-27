@@ -1,0 +1,19 @@
+node_modules/
+dist/
+publicmodules/
+
+# logs
+*.log
+*.err
+
+# stray audio files
+*.flac
+*.mp3
+*.m4a
+
+# Apple Music cookies (personal)
+.spotiflac/
+
+# OS
+.DS_Store
+Thumbs.db

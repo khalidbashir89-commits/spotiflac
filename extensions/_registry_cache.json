@@ -1,0 +1,251 @@
+{
+  "fetchedAt": 1779876344020,
+  "extensions": [
+    {
+      "id": "curated-jiosaavn",
+      "name": "JioSaavn",
+      "description": "JioSaavn 320kbps music provider — ideal for Indian, Bollywood, Tamil, Telugu music. Delivers FLAC-quality downloads.",
+      "author": "SpotiFLAC",
+      "version": "2.0.0",
+      "stars": null,
+      "rawUrl": null,
+      "repoUrl": null,
+      "topics": [
+        "spotiflac-extension",
+        "jiosaavn",
+        "indian-music"
+      ],
+      "capabilities": [
+        "search",
+        "stream",
+        "download"
+      ],
+      "curated": true,
+      "bundled": true,
+      "format": "flac"
+    },
+    {
+      "id": "curated-ytmusic",
+      "name": "YouTube Music",
+      "description": "YouTube Music via InnerTube API — worldwide catalog, 160kbps opus audio with FLAC conversion.",
+      "author": "SpotiFLAC",
+      "version": "2.0.0",
+      "stars": null,
+      "rawUrl": null,
+      "repoUrl": null,
+      "topics": [
+        "spotiflac-extension",
+        "youtube-music"
+      ],
+      "capabilities": [
+        "search",
+        "stream"
+      ],
+      "curated": true,
+      "bundled": true,
+      "format": "flac"
+    },
+    {
+      "id": "curated-demo",
+      "name": "Free HD Music (Demo)",
+      "description": "Searches Free Music Archive and Internet Archive for legally free, high-quality tracks. Bundled with SpotiFLAC — always available.",
+      "author": "SpotiFLAC",
+      "version": "1.2.0",
+      "stars": null,
+      "rawUrl": null,
+      "repoUrl": null,
+      "topics": [
+        "spotiflac-extension",
+        "fma",
+        "free-music"
+      ],
+      "capabilities": [
+        "search",
+        "download"
+      ],
+      "curated": true,
+      "bundled": true,
+      "format": "mp3/flac"
+    },
+    {
+      "id": "curated-jiosaavn",
+      "name": "JioSaavn",
+      "description": "Search and stream high-quality audio from JioSaavn's public API. Supports 320kbps MP3 and some FLAC tracks.",
+      "author": "community",
+      "version": "1.0.0",
+      "stars": null,
+      "rawUrl": "https://raw.githubusercontent.com/spotiflac-extensions/jiosaavn/main/index.js",
+      "repoUrl": "https://github.com/spotiflac-extensions/jiosaavn",
+      "topics": [
+        "spotiflac-extension",
+        "jiosaavn"
+      ],
+      "capabilities": [
+        "search",
+        "stream",
+        "download"
+      ],
+      "curated": true,
+      "bundled": false,
+      "format": "mp3/flac"
+    },
+    {
+      "id": "curated-soundcloud",
+      "name": "SoundCloud",
+      "description": "Search SoundCloud's public catalog. Downloads available for tracks with open download permissions.",
+      "author": "community",
+      "version": "1.1.0",
+      "stars": null,
+      "rawUrl": "https://raw.githubusercontent.com/spotiflac-extensions/soundcloud/main/index.js",
+      "repoUrl": "https://github.com/spotiflac-extensions/soundcloud",
+      "topics": [
+        "spotiflac-extension",
+        "soundcloud"
+      ],
+      "capabilities": [
+        "search",
+        "stream"
+      ],
+      "curated": true,
+      "bundled": false,
+      "format": "mp3"
+    },
+    {
+      "id": "curated-bandcamp",
+      "name": "Bandcamp",
+      "description": "Search and download FLAC/MP3 from Bandcamp artists who offer free downloads. Respects artist download permissions.",
+      "author": "community",
+      "version": "1.0.2",
+      "stars": null,
+      "rawUrl": "https://raw.githubusercontent.com/spotiflac-extensions/bandcamp/main/index.js",
+      "repoUrl": "https://github.com/spotiflac-extensions/bandcamp",
+      "topics": [
+        "spotiflac-extension",
+        "bandcamp",
+        "flac"
+      ],
+      "capabilities": [
+        "search",
+        "download"
+      ],
+      "curated": true,
+      "bundled": false,
+      "format": "flac/mp3/wav"
+    },
+    {
+      "id": "curated-archive-org",
+      "name": "Internet Archive",
+      "description": "Access millions of freely available audio recordings on archive.org — concerts, live bootlegs, historical recordings, and lossless FLAC.",
+      "author": "community",
+      "version": "2.0.0",
+      "stars": null,
+      "rawUrl": "https://raw.githubusercontent.com/spotiflac-extensions/internet-archive/main/index.js",
+      "repoUrl": "https://github.com/spotiflac-extensions/internet-archive",
+      "topics": [
+        "spotiflac-extension",
+        "archive-org",
+        "flac"
+      ],
+      "capabilities": [
+        "search",
+        "download",
+        "stream"
+      ],
+      "curated": true,
+      "bundled": false,
+      "format": "flac/mp3/ogg"
+    },
+    {
+      "id": "gh-1132936528",
+      "name": "SpotiFLAC Extension",
+      "description": "Extension Registry for SpotiFLAC-Mobile. Browse, submit, and download community-built extensions.",
+      "author": "spotiflacapp",
+      "version": "1.0.0",
+      "stars": 351,
+      "rawUrl": null,
+      "repoUrl": "https://github.com/spotiflacapp/SpotiFLAC-Extension",
+      "topics": [],
+      "capabilities": [
+        "search"
+      ],
+      "curated": false,
+      "bundled": false,
+      "format": "flac",
+      "updatedAt": "2026-05-27T09:58:50Z"
+    },
+    {
+      "id": "gh-1133115155",
+      "name": "YT Music SpotiFLAC",
+      "description": "A high‑performance SpotiFLAC extension that adds YouTube Music as a source for search, metadata, and high‑quality audio downloads.",
+      "author": "Amonoman",
+      "version": "1.0.0",
+      "stars": 30,
+      "rawUrl": "https://raw.githubusercontent.com/Amonoman/YT-Music-SpotiFLAC/main/index.js",
+      "repoUrl": "https://github.com/Amonoman/YT-Music-SpotiFLAC",
+      "topics": [],
+      "capabilities": [
+        "search"
+      ],
+      "curated": false,
+      "bundled": false,
+      "format": "flac",
+      "updatedAt": "2026-05-26T05:30:17Z"
+    },
+    {
+      "id": "gh-1208369169",
+      "name": "SpoitiLists",
+      "description": "SpoitiLists — unofficial SpotiFLAC Mobile extension: your Spotify playlists & saved (liked) tracks on Home via Spotify Web API + OAuth PKCE. Custom Spotify search, open.spotify.com URLs. Install from Store with registry.json + spoiti-lists.spotiflac-ext. Playlist tracks refresh when opened; Home may cache briefly. MIT. Not Spotify or SpotiFLAC.",
+      "author": "AlexRabbit",
+      "version": "1.0.0",
+      "stars": 4,
+      "rawUrl": "https://raw.githubusercontent.com/AlexRabbit/SpoitiLists/main/index.js",
+      "repoUrl": "https://github.com/AlexRabbit/SpoitiLists",
+      "topics": [],
+      "capabilities": [
+        "search"
+      ],
+      "curated": false,
+      "bundled": false,
+      "format": "flac",
+      "updatedAt": "2026-05-16T00:07:32Z"
+    },
+    {
+      "id": "gh-1135752126",
+      "name": "SpotifyFlac Native",
+      "description": "A SpotiFLAC extension to download the songs directly from Spotify ",
+      "author": "Onlineraider",
+      "version": "1.0.0",
+      "stars": 1,
+      "rawUrl": null,
+      "repoUrl": "https://github.com/Onlineraider/SpotifyFlac-native",
+      "topics": [],
+      "capabilities": [
+        "search"
+      ],
+      "curated": false,
+      "bundled": false,
+      "format": "flac",
+      "updatedAt": "2026-04-18T11:50:45Z"
+    },
+    {
+      "id": "gh-1236359309",
+      "name": "Ym Spotiflac Ext",
+      "description": "YouTube music extension for spotiflac",
+      "author": "SANDRO00O",
+      "version": "1.0.0",
+      "stars": 0,
+      "rawUrl": null,
+      "repoUrl": "https://github.com/SANDRO00O/ym-spotiflac-ext",
+      "topics": [],
+      "capabilities": [
+        "search"
+      ],
+      "curated": false,
+      "bundled": false,
+      "format": "flac",
+      "updatedAt": "2026-05-19T02:48:28Z"
+    }
+  ],
+  "githubCount": 5,
+  "curatedCount": 7
+}

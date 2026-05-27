@@ -1,0 +1,7 @@
+{
+  "disabled": [
+    "demo-extension.js",
+    "jiosaavn.js",
+    "ytmusic.js"
+  ]
+}

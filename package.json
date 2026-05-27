@@ -1,0 +1,66 @@
+{
+  "name": "spotiflac",
+  "version": "1.0.0",
+  "description": "Lossless music downloader",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "electron": "electron .",
+    "build": "electron-builder --win --x64",
+    "package": "electron-packager . SpotiFLAC --platform=win32 --arch=x64 --out=dist --overwrite",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "archiver": "^8.0.0",
+    "axios": "^1.16.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "electron": "^36.9.5",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.spotiflac.app",
+    "productName": "SpotiFLAC",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "server.js",
+      "server/**/*",
+      "extensions/**/*",
+      "public/**/*",
+      "node_modules/**/*",
+      "!node_modules/.cache",
+      "!node_modules/.bin"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

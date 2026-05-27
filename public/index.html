@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpotiFLAC</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Circular+Std:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Left Sidebar -->
+    <aside id="sidebar">
+      <div id="sidebar-top">
+        <div id="logo">
+          <svg viewBox="0 0 24 24" fill="#1DB954" width="32" height="32">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+          </svg>
+          <span>SpotiFLAC</span>
+        </div>
+
+        <nav id="main-nav">
+          <a href="#" class="nav-item active" data-view="home">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z"/>
+            </svg>
+            <span>Home</span>
+          </a>
+          <a href="#" class="nav-item" data-view="search">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M10.533 1.279c-5.18 0-9.407 4.927-9.407 10.012 0 5.084 4.226 10.012 9.407 10.012 2.234 0 4.29-.823 5.862-2.168l3.857 4.859a1 1 0 1 0 1.578-1.252l-3.887-4.894a9.932 9.932 0 0 0 2.597-6.557c0-5.085-4.226-10.012-9.407-10.012zm-7.407 10.012c0-4.21 3.391-8.012 7.407-8.012s7.407 3.801 7.407 8.012c0 4.21-3.391 8.012-7.407 8.012S3.126 15.501 3.126 11.291z"/>
+            </svg>
+            <span>Search</span>
+          </a>
+          <a href="#" class="nav-item" data-view="library">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v10.793l2.5-1.44V2.134zM13 4H4v16h7.5v-6a1 1 0 0 1 .5-.866l4.5-2.598V4.598L13 4zm6.5 8.134L15.5 14.4V20H20V8.598l-.5-.366z"/>
+            </svg>
+            <span>Your Library</span>
+          </a>
+        </nav>
+      </div>
+
+      <div id="sidebar-library">
+        <div id="library-header">
+          <span>Your Library</span>
+          <button id="btn-create-playlist" title="Create playlist">
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="currentColor" d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="library-list">
+          <div class="library-empty">
+            <p>Create your first playlist</p>
+            <span>It's easy, we'll help you</span>
+            <button class="btn-primary btn-sm">Create playlist</button>
+          </div>
+        </div>
+        <div id="downloaded-tracks">
+          <div id="downloaded-header">Downloaded</div>
+          <div id="downloaded-list"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+      <div id="topbar">
+        <div id="topbar-nav">
+          <button id="btn-back" title="Go back" disabled>
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="currentColor" d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"/>
+            </svg>
+          </button>
+          <button id="btn-forward" title="Go forward" disabled>
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="currentColor" d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8 4.97 14.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="search-bar">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M10.533 1.279c-5.18 0-9.407 4.927-9.407 10.012 0 5.084 4.226 10.012 9.407 10.012 2.234 0 4.29-.823 5.862-2.168l3.857 4.859a1 1 0 1 0 1.578-1.252l-3.887-4.894a9.932 9.932 0 0 0 2.597-6.557c0-5.085-4.226-10.012-9.407-10.012zm-7.407 10.012c0-4.21 3.391-8.012 7.407-8.012s7.407 3.801 7.407 8.012c0 4.21-3.391 8.012-7.407 8.012S3.126 15.501 3.126 11.291z"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="What do you want to listen to?" autocomplete="off" />
+          <button id="btn-clear-search" style="display:none">
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="currentColor" d="M1.47 1.47a.75.75 0 0 1 1.06 0L8 6.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L9.06 8l5.47 5.47a.75.75 0 1 1-1.06 1.06L8 9.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L6.94 8 1.47 2.53a.75.75 0 0 1 0-1.06z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="topbar-user">
+          <div id="extension-status">
+            <span id="ext-indicator" class="ext-dot"></span>
+            <span id="ext-label">Extensions</span>
+          </div>
+          <button id="btn-open-url-input" class="btn-secondary btn-sm" title="Open Apple Music URL">
+            <svg viewBox="0 0 24 24" width="14" height="14" style="margin-right:4px;vertical-align:middle"><path fill="currentColor" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+            Open URL
+          </button>
+          <a id="btn-apple-setup" href="/apple-setup" class="btn-secondary btn-sm" title="Configure Apple Music lossless">
+            <svg viewBox="0 0 24 24" width="14" height="14" style="margin-right:4px;vertical-align:middle"><path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+            Apple Music
+          </a>
+          <button id="btn-install-ext" class="btn-secondary btn-sm">Manage Extensions</button>
+        </div>
+      </div>
+
+      <!-- URL Input Bar -->
+      <div id="url-input-bar" style="display:none">
+        <svg viewBox="0 0 24 24" width="16" height="16" style="flex-shrink:0;color:#a7a7a7"><path fill="currentColor" d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        <input type="text" id="url-input" placeholder="Paste Apple Music URL (album, playlist, artist)..." autocomplete="off" />
+        <button id="btn-url-go" class="btn-primary btn-sm">Load</button>
+        <button id="btn-url-close" class="btn-secondary btn-sm">✕</button>
+      </div>
+
+      <!-- Views -->
+      <div id="views-container">
+
+        <!-- Home View -->
+        <div id="view-home" class="view active">
+          <div id="home-greeting">
+            <h1 id="greeting-text">Good evening</h1>
+            <div id="recent-grid"></div>
+          </div>
+          <section id="featured-section">
+            <h2>Featured Artists</h2>
+            <div id="featured-grid" class="card-grid"></div>
+          </section>
+          <section id="genres-section">
+            <h2>Browse Categories</h2>
+            <div id="genres-grid" class="category-grid"></div>
+          </section>
+        </div>
+
+        <!-- Search View -->
+        <div id="view-search" class="view">
+          <div id="search-state-empty">
+            <div class="search-empty-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path fill="currentColor" d="M10.533 1.279c-5.18 0-9.407 4.927-9.407 10.012 0 5.084 4.226 10.012 9.407 10.012 2.234 0 4.29-.823 5.862-2.168l3.857 4.859a1 1 0 1 0 1.578-1.252l-3.887-4.894a9.932 9.932 0 0 0 2.597-6.557c0-5.085-4.226-10.012-9.407-10.012zm-7.407 10.012c0-4.21 3.391-8.012 7.407-8.012s7.407 3.801 7.407 8.012c0 4.21-3.391 8.012-7.407 8.012S3.126 15.501 3.126 11.291z"/>
+              </svg>
+            </div>
+            <p>Search for FLAC tracks across all extensions</p>
+          </div>
+          <div id="search-state-loading" style="display:none">
+            <div class="spinner-ring"></div>
+            <p>Searching extensions...</p>
+          </div>
+          <div id="search-results" style="display:none">
+            <div id="results-header">
+              <h2>Search Results</h2>
+              <div id="results-meta"></div>
+              <div id="extension-filter"></div>
+              <button id="btn-search-select" class="btn-secondary btn-sm">Select</button>
+            </div>
+            <!-- Batch toolbar (visible in select mode) -->
+            <div id="search-select-toolbar" style="display:none">
+              <span id="search-select-count">0 selected</span>
+              <button id="btn-search-download-selected" class="btn-primary btn-sm">
+                <svg viewBox="0 0 24 24" width="14" height="14" style="margin-right:4px;vertical-align:middle"><path fill="currentColor" d="M12 16.5l-6-6h4V3h4v7.5h4l-6 6zM5 19h14v2H5v-2z"/></svg>
+                Download Selected
+              </button>
+              <button id="btn-search-select-all" class="btn-secondary btn-sm">Select All</button>
+              <button id="btn-search-deselect" class="btn-secondary btn-sm">Deselect All</button>
+            </div>
+            <div id="results-top-track"></div>
+            <div id="results-tracks-section">
+              <h3>Tracks</h3>
+              <div id="results-table">
+                <div id="results-table-header" class="track-row track-header">
+                  <span class="col-check"></span>
+                  <span class="col-num">#</span>
+                  <span class="col-title">Title</span>
+                  <span class="col-artist">Artist</span>
+                  <span class="col-album">Album</span>
+                  <span class="col-duration">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                      <path fill="currentColor" d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/><path fill="currentColor" d="M8 3.25a.75.75 0 0 1 .75.75v3.25H11a.75.75 0 0 1 0 1.5H7.25V4A.75.75 0 0 1 8 3.25z"/>
+                    </svg>
+                  </span>
+                  <span class="col-actions"></span>
+                </div>
+                <div id="results-track-list"></div>
+              </div>
+            </div>
+          </div>
+          <div id="search-state-error" style="display:none">
+            <p class="error-msg"></p>
+          </div>
+        </div>
+
+        <!-- Library View -->
+        <div id="view-library" class="view">
+          <h1>Your Library</h1>
+          <div id="library-downloads">
+            <h2>Downloaded Tracks</h2>
+            <div id="library-track-list"></div>
+          </div>
+        </div>
+
+        <!-- Collection View (Album / Artist / Playlist) -->
+        <div id="view-collection" class="view">
+          <div id="collection-hero">
+            <div id="collection-hero-gradient"></div>
+            <img id="collection-art" src="" alt="" />
+            <div id="collection-hero-info">
+              <div id="collection-type-label"></div>
+              <h1 id="collection-title"></h1>
+              <div id="collection-subtitle">
+                <a id="collection-artist-link" href="#" class="collection-link"></a>
+                <span id="collection-meta-extra"></span>
+              </div>
+              <div id="collection-actions">
+                <button id="btn-collection-play" class="btn-primary collection-action-btn">
+                  <svg viewBox="0 0 16 16" width="18" height="18" style="margin-right:6px;vertical-align:middle"><path fill="currentColor" d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg>
+                  Play
+                </button>
+                <button id="btn-collection-download-all" class="btn-secondary collection-action-btn">
+                  <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right:6px;vertical-align:middle"><path fill="currentColor" d="M12 16.5l-6-6h4V3h4v7.5h4l-6 6zM5 19h14v2H5v-2z"/></svg>
+                  Download All
+                </button>
+                <button id="btn-collection-select" class="btn-secondary collection-action-btn">Select All</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="collection-toolbar" style="display:none">
+            <span id="collection-select-count">0 selected</span>
+            <button id="btn-collection-download-selected" class="btn-primary">
+              <svg viewBox="0 0 24 24" width="14" height="14" style="margin-right:4px;vertical-align:middle"><path fill="currentColor" d="M12 16.5l-6-6h4V3h4v7.5h4l-6 6zM5 19h14v2H5v-2z"/></svg>
+              Download Selected
+            </button>
+            <button id="btn-collection-deselect" class="btn-secondary">Deselect All</button>
+            <button id="btn-collection-select-all" class="btn-secondary">Select All</button>
+          </div>
+
+          <div id="collection-content">
+            <!-- Track list for albums/playlists -->
+            <div id="collection-track-list"></div>
+
+            <!-- Top songs for artists -->
+            <div id="artist-topsongs-section" style="display:none">
+              <h2 class="collection-section-heading">Popular</h2>
+              <div id="artist-topsongs-list"></div>
+            </div>
+
+            <!-- Album grid for artists -->
+            <div id="artist-albums-section" style="display:none">
+              <h2 class="collection-section-heading">Albums</h2>
+              <div id="artist-albums-grid" class="card-grid"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Context Menu -->
+    <div id="context-menu" style="display:none">
+      <ul id="context-menu-list"></ul>
+    </div>
+
+    <!-- Extension Manager Modal -->
+    <div id="modal-overlay" style="display:none">
+      <div id="modal-ext-manager">
+        <div id="modal-header">
+          <h2>Extension Manager</h2>
+          <button id="btn-close-modal">
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="currentColor" d="M1.47 1.47a.75.75 0 0 1 1.06 0L8 6.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L9.06 8l5.47 5.47a.75.75 0 1 1-1.06 1.06L8 9.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L6.94 8 1.47 2.53a.75.75 0 0 1 0-1.06z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="modal-body">
+          <!-- Populated dynamically by ui.js -->
+        </div>
+        <div id="modal-footer">
+          <!-- Populated dynamically by ui.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Track Detail Tooltip -->
+    <div id="track-tooltip" style="display:none">
+      <img id="tooltip-art" src="" alt="" />
+      <div id="tooltip-info">
+        <div id="tooltip-title"></div>
+        <div id="tooltip-artist"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Player Bar -->
+  <div id="player-bar">
+    <div id="player-now-playing">
+      <div id="player-art-wrap">
+        <img id="player-art" src="" alt="" />
+        <div id="player-art-placeholder">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M9 3a1 1 0 0 0-1 1v10.185a3.5 3.5 0 1 0 2 3.115V9h8V6a3 3 0 0 0-3-3H9zm7 4H10V5h6a1 1 0 0 1 1 1v1zM7.5 20a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+          </svg>
+        </div>
+      </div>
+      <div id="player-track-info">
+        <div id="player-track-title">—</div>
+        <div id="player-track-artist"></div>
+      </div>
+      <button id="btn-player-heart" class="player-icon-btn" title="Save to library">
+        <svg viewBox="0 0 16 16" width="16" height="16">
+          <path fill="currentColor" d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm5-2.25a2.25 2.25 0 0 1 4.5 0 .75.75 0 0 1-1.5 0 .75.75 0 0 0-1.5 0c0 1.044.575 1.913 1.5 2.89.925-.977 1.5-1.846 1.5-2.89a.75.75 0 0 1 1.5 0c0 1.68-.986 3-2.25 4.25C8 11.5 6 9.929 6 8.25 6 7.25 5.5 6.5 5 5.75z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="player-controls-center">
+      <div id="player-controls">
+        <button id="btn-shuffle" class="player-icon-btn" title="Shuffle">
+          <svg viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15 4.5l-2.849-3.578zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5zm7.925 6.084.979-1.167 1.796 2.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06L15 11.5l-2.849 3.078a.75.75 0 1 1-1.06-1.06l1.017-1.018H10.16a3.75 3.75 0 0 1-2.873-1.34l-.972-1.076z"/>
+          </svg>
+        </button>
+        <button id="btn-prev" class="player-icon-btn" title="Previous">
+          <svg viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M3.3 1a.7.7 0 0 1 .7.7v5.15l9.95-5.744a.7.7 0 0 1 1.05.606v12.575a.7.7 0 0 1-1.05.607L4 9.149V14.3a.7.7 0 0 1-.7.7H1.7a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7h1.6z"/>
+          </svg>
+        </button>
+        <button id="btn-play-pause" class="player-play-btn" title="Play">
+          <svg id="icon-play" viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/>
+          </svg>
+          <svg id="icon-pause" viewBox="0 0 16 16" width="16" height="16" style="display:none">
+            <path fill="currentColor" d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/>
+          </svg>
+        </button>
+        <button id="btn-next" class="player-icon-btn" title="Next">
+          <svg viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M12.7 1a.7.7 0 0 0-.7.7v5.15L2.05 1.107A.7.7 0 0 0 1 1.712v12.575a.7.7 0 0 0 1.05.607L12 9.149V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/>
+          </svg>
+        </button>
+        <button id="btn-repeat" class="player-icon-btn" title="Repeat">
+          <svg viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75v-5z"/>
+          </svg>
+        </button>
+      </div>
+      <div id="player-timeline">
+        <span id="player-current-time">0:00</span>
+        <div id="player-progress-container">
+          <div id="player-progress-bar">
+            <div id="player-progress-fill"></div>
+            <div id="player-progress-thumb"></div>
+          </div>
+        </div>
+        <span id="player-total-time">0:00</span>
+      </div>
+    </div>
+
+    <div id="player-right">
+      <button id="btn-download-flac" class="btn-download" title="Download FLAC" disabled>
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M12 16.5l-6-6h4V3h4v7.5h4l-6 6zM5 19h14v2H5v-2z"/>
+        </svg>
+        <span>Download FLAC</span>
+        <span id="download-format-badge">FLAC</span>
+      </button>
+      <div id="player-volume">
+        <button id="btn-volume" class="player-icon-btn" title="Mute">
+          <svg id="icon-vol-high" viewBox="0 0 16 16" width="16" height="16">
+            <path fill="currentColor" d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.642 3.642 0 0 1-1.33-4.967 3.639 3.639 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.139 2.139 0 0 0 0 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 0 1 0 4.88z"/>
+            <path fill="currentColor" d="M11.5 13.614a5.752 5.752 0 0 0 0-11.228v1.55a4.252 4.252 0 0 1 0 8.127v1.55z"/>
+          </svg>
+        </button>
+        <div id="volume-slider-container">
+          <div id="volume-slider">
+            <div id="volume-fill"></div>
+            <div id="volume-thumb"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Audio Element -->
+  <audio id="audio-engine" preload="auto" crossorigin="anonymous"></audio>
+
+  <script type="module" src="modules/player.js"></script>
+  <script type="module" src="modules/search.js"></script>
+  <script type="module" src="modules/ui.js"></script>
+  <script type="module" src="modules/collection.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
